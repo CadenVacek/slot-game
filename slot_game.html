@@ -1,0 +1,572 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Money Money Money Image-Based Slot Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ranchers&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Money Money Money Slot Game">
+    <meta property="og:description" content="Spin the reels and win big with this exciting mobile slot game!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/title.png">
+    <meta property="og:url" content="https://cadenVacek.github.io/slot-game/">
+    <meta name="twitter:card" content="summary_large_image">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            font-family: 'Ranchers', cursive;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        .slot-machine {
+            text-align: center;
+            background-color: #2e2e2e;
+            padding: 4vw;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90vw;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        .title {
+            margin-bottom: 4vw;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .title img {
+            max-width: 160%;
+            height: auto;
+            margin: 0 auto;
+        }
+        .title-fallback {
+            font-size: 4vw;
+            color: #ffd700;
+            text-align: center;
+        }
+        .balance {
+            margin-bottom: 4vw;
+            font-size: 5vw;
+            color: #ffd700;
+        }
+        .instructions {
+            margin-bottom: 4vw;
+            font-size: 3vw;
+            color: #ffd700;
+            max-width: 80%;
+            text-align: left;
+        }
+        .paychart {
+            margin-bottom: 4vw;
+            font-size: 3.5vw;
+            color: #ffd700;
+            max-width: 80%;
+            text-align: left;
+            background-color: #3e3e3e;
+            padding: 3vw;
+            border-radius: 5px;
+            border: 1px solid #ffd700;
+        }
+        .paychart h3 {
+            margin: 0 0 2vw 0;
+            font-size: 4.5vw;
+        }
+        .paychart ul {
+            margin: 0;
+            padding-left: 5vw;
+            list-style: none;
+        }
+        .paychart li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1vw;
+        }
+        .paychart img {
+            width: 20px;
+            height: 20px;
+            margin-right: 2vw;
+            object-fit: contain;
+        }
+        .bet-controls {
+            margin: 2vw 0;
+            display: flex;
+            gap: 2vw;
+            align-items: center;
+        }
+        .bet-controls label {
+            font-size: 4vw;
+            color: #ffd700;
+        }
+        .bet-controls select {
+            padding: 2vw;
+            font-size: 4vw;
+            background-color: #ffd700;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Ranchers', cursive;
+            cursor: pointer;
+            width: 30vw;
+        }
+        .reels {
+            display: flex;
+            justify-content: center;
+            gap: 2vw;
+            margin-bottom: 4vw;
+        }
+        .reel {
+            width: 80px;
+            height: 144px;
+            background: linear-gradient(90deg, #333, #444, #333);
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+        .symbol-container {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .symbol {
+            width: 100%;
+            height: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        .symbol img {
+            max-height: 40px;
+            max-width: 40px;
+            object-fit: contain;
+        }
+        .middle {
+            background-color: #f0f0f0;
+            border-top: 2px solid #ffd700;
+            border-bottom: 2px solid #ffd700;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+        .spinning {
+            animation: spin 0.5s linear infinite;
+            filter: blur(4px);
+        }
+        .stopping {
+            animation: settle 0.3s ease-out;
+            filter: blur(0);
+        }
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-2400px); }
+        }
+        @keyframes settle {
+            0% { transform: translateY(-8px); }
+            70% { transform: translateY(4px); }
+            100% { transform: translateY(0); }
+        }
+        .win-flash {
+            animation: flash 0.5s 3;
+        }
+        @keyframes flash {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(255, 215, 0, 1); }
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: #ffd700;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Ranchers', cursive;
+            margin: 2vw 0;
+        }
+        button:hover {
+            background-color: #e6c200;
+        }
+        button[onclick="shareGame()"] {
+            background-color: #4CAF50;
+        }
+        button[onclick="shareGame()"]:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 4vw;
+            font-size: 18px;
+            color: #ffd700;
+            max-width: 80%;
+        }
+        .creator-credit {
+            margin-top: 4vw;
+            font-size: 10px;
+            color: #ffd700;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .slot-machine {
+                padding: 5vw;
+                width: 95vw;
+            }
+            .title img {
+                max-width: 150%;
+            }
+            .title-fallback {
+                font-size: 3.5vw;
+            }
+            .reel {
+                width: 70px;
+                height: 126px;
+            }
+            .symbol {
+                height: 42px;
+            }
+            .symbol img {
+                max-height: 35px;
+                max-width: 35px;
+            }
+            .paychart img {
+                width: 18px;
+                height: 18px;
+            }
+            @keyframes spin {
+                0% { transform: translateY(0); }
+                100% { transform: translateY(-2100px); }
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            #result {
+                font-size: 16px;
+            }
+            .creator-credit {
+                font-size: 9px;
+            }
+            .instructions {
+                font-size: 2.8vw;
+            }
+            .paychart {
+                font-size: 3.2vw;
+            }
+            .paychart h3 {
+                font-size: 4vw;
+            }
+            .bet-controls label {
+                font-size: 3.8vw;
+            }
+            .bet-controls select {
+                font-size: 3.8vw;
+                width: 28vw;
+            }
+            .balance {
+                font-size: 4.5vw;
+            }
+        }
+        @media (max-width: 480px) {
+            .slot-machine {
+                padding: 6vw;
+                width: 100vw;
+            }
+            .title img {
+                max-width: 140%;
+            }
+            .title-fallback {
+                font-size: 12px;
+            }
+            .balance {
+                font-size: 16px;
+            }
+            .instructions {
+                font-size: 12px;
+            }
+            .paychart {
+                font-size: 11px;
+            }
+            .paychart h3 {
+                font-size: 13px;
+            }
+            .paychart img {
+                width: 16px;
+                height: 16px;
+            }
+            .bet-controls label {
+                font-size: 13px;
+            }
+            .bet-controls select {
+                font-size: 13px;
+                width: 110px;
+            }
+            .reel {
+                width: 60px;
+                height: 108px;
+            }
+            .symbol {
+                height: 36px;
+            }
+            .symbol img {
+                max-height: 30px;
+                max-width: 30px;
+            }
+            @keyframes spin {
+                0% { transform: translateY(0); }
+                100% { transform: translateY(-1800px); }
+            }
+            button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            #result {
+                font-size: 14px;
+            }
+            .creator-credit {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slot-machine">
+        <div class="title">
+            <img src="https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/title.png" alt="Slot Game Title" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+            <div class="title-fallback" style="display: none;">Money Money Money Slot Game</div>
+        </div>
+        <div class="instructions">
+            Instructions: Choose a bet amount, then tap Spin to start the reels. Match three identical symbols on the center line to win big! Ensure you have enough credits to spin.
+        </div>
+        <div class="paychart">
+            <h3>Paychart</h3>
+            <ul>
+                <li><img src="https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/green.png" alt="Green Symbol"> Green Symbol: 8x bet</li>
+                <li><img src="https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/red.png" alt="Red Symbol"> Red Symbol: 18x bet</li>
+                <li><img src="https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/yellow.png" alt="Yellow Symbol"> Yellow Symbol: 80x bet</li>
+            </ul>
+        </div>
+        <div class="balance" id="balance">Balance: 10000 Credits</div>
+        <div class="reels" id="reels">
+            <div class="reel" id="reel1">
+                <div class="symbol-container" id="container1"></div>
+            </div>
+            <div class="reel" id="reel2">
+                <div class="symbol-container" id="container2"></div>
+            </div>
+            <div class="reel" id="reel3">
+                <div class="symbol-container" id="container3"></div>
+            </div>
+        </div>
+        <button onclick="spin()">Spin</button>
+        <div class="bet-controls">
+            <label for="bet-amount">Bet Amount:</label>
+            <select id="bet-amount">
+                <option value="10">10 Credits</option>
+                <option value="25">25 Credits</option>
+                <option value="50">50 Credits</option>
+                <option value="100">100 Credits</option>
+                <option value="250">250 Credits</option>
+                <option value="500">500 Credits</option>
+            </select>
+        </div>
+        <button onclick="shareGame()">Share</button>
+        <div id="result"></div>
+        <div class="creator-credit">Created by Caden Vacek & Grok 2025</div>
+    </div>
+
+    <script>
+        const symbolImages = [
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/green.png',
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/red.png',
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/yellow.png',
+            ''
+        ];
+        const payouts = {
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/green.png': 8,
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/red.png': 18,
+            'https://raw.githubusercontent.com/CadenVacek/slot-game/main/images/yellow.png': 80
+        };
+        const winMessages = [
+            "Jackpot! You're richer than a gold miner!",
+            "Cha-ching! Time to buy a fancy hat!",
+            "Yeehaw! You're rollin' in the dough!",
+            "Hot dang! That's a heap of winnings!",
+            "Well, slap my knee! You hit the big one!"
+        ];
+        let spinning = false;
+        let coinBalance = 10000; // Starting balance
+        const stripLength = 50; // Long strip for seamless spinning
+        const symbolHeight = 48; // Fixed symbol height in pixels (default)
+        const stripHeight = stripLength * symbolHeight; // Total strip height in pixels
+
+        function updateBalance() {
+            document.getElementById('balance').textContent = `Balance: ${coinBalance} Credits`;
+        }
+
+        function initializeReel(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const middleIndex = Math.floor(144 / symbolHeight / 2); // Middle symbol for 144px reel height
+            for (let i = 0; i < stripLength; i++) {
+                const symbolDiv = document.createElement('div');
+                symbolDiv.className = 'symbol' + (i === middleIndex ? ' middle' : '');
+                const symbolValue = symbolImages[Math.floor(Math.random() * symbolImages.length)];
+                if (symbolValue) {
+                    const img = document.createElement('img');
+                    img.src = symbolValue;
+                    img.onerror = () => {
+                        console.error(`Failed to load image: ${symbolValue}`);
+                        document.getElementById('result').textContent = 'Error loading symbols. Please try again.';
+                    };
+                    symbolDiv.appendChild(img);
+                }
+                container.appendChild(symbolDiv);
+            }
+            // Start at top of strip to fill reel window
+            container.style.transform = 'translateY(0)';
+        }
+
+        function shareGame() {
+            const shareUrl = window.location.href;
+            const shareText = "Check out this awesome slot game! Spin to win big! 🎰";
+            if (navigator.share) {
+                navigator.share({
+                    title: "Money Money Money Slot Game",
+                    text: shareText,
+                    url: shareUrl
+                }).catch(err => console.error("Share failed:", err));
+            } else {
+                prompt("Copy this link to share the game:", shareUrl);
+            }
+        }
+
+        // Initialize reels on page load
+        ['container1', 'container2', 'container3'].forEach(initializeReel);
+        updateBalance();
+
+        function spin() {
+            if (spinning) return;
+            const betAmount = parseInt(document.getElementById('bet-amount').value);
+            if (coinBalance < betAmount) {
+                document.getElementById('result').textContent = 'Insufficient balance! Add more credits.';
+                return;
+            }
+            coinBalance -= betAmount;
+            updateBalance();
+            spinning = true;
+            document.getElementById('result').textContent = '';
+
+            const containers = document.querySelectorAll('.symbol-container');
+            const middleIndex = Math.floor(144 / symbolHeight / 2); // Middle symbol for 144px reel height
+            containers.forEach(container => {
+                // Reinitialize reel with new random symbols
+                initializeReel(container.id);
+                container.classList.add('spinning');
+                container.classList.remove('stopping');
+                container.querySelector('.middle').classList.remove('win-flash');
+            });
+
+            const stopDelays = [3000, 3500, 4000];
+            containers.forEach((container, index) => {
+                setTimeout(() => {
+                    container.classList.remove('spinning');
+                    container.classList.add('stopping');
+                    const symbolsInReel = container.querySelectorAll('.symbol');
+                    const randomIndex = Math.floor(Math.random() * symbolImages.length);
+                    symbolsInReel.forEach((symbol, i) => {
+                        const img = symbol.querySelector('img') || document.createElement('img');
+                        const symbolValue = symbolImages[(randomIndex + i) % symbolImages.length];
+                        if (symbolValue) {
+                            img.src = symbolValue;
+                            img.onerror = () => {
+                                console.error(`Failed to load image: ${symbolValue}`);
+                                document.getElementById('result').textContent = 'Error loading symbols. Please try again.';
+                            };
+                            symbol.appendChild(img);
+                        } else {
+                            symbol.innerHTML = '';
+                        }
+                        // Reassign middle class to ensure correct symbol is highlighted
+                        symbol.className = 'symbol' + (i === middleIndex ? ' middle' : '');
+                    });
+                    // Position middle symbol in center for stopping
+                    container.style.transform = `translateY(-${middleIndex * symbolHeight}px)`;
+                    if (index === containers.length - 1) {
+                        checkWin(betAmount);
+                        spinning = false;
+                    }
+                }, stopDelays[index]);
+            });
+        }
+
+        function checkWin(betAmount) {
+            const middleSymbols = [
+                document.querySelector('#container1 .middle').querySelector('img')?.src || '',
+                document.querySelector('#container2 .middle').querySelector('img')?.src || '',
+                document.querySelector('#container3 .middle').querySelector('img')?.src || ''
+            ];
+
+            let resultText = 'Try Again!';
+            if (middleSymbols[0] && middleSymbols[0] === middleSymbols[1] && middleSymbols[1] === middleSymbols[2]) {
+                const multiplier = payouts[middleSymbols[0]];
+                const winnings = betAmount * multiplier;
+                coinBalance += winnings;
+                updateBalance();
+                const funnyMessage = winMessages[Math.floor(Math.random() * winMessages.length)];
+                resultText = `${funnyMessage} Won ${winnings} credits!`;
+                document.querySelectorAll('.middle').forEach(symbol => {
+                    symbol.classList.add('win-flash');
+                });
+            }
+            document.getElementById('result').textContent = resultText;
+        }
+    </script>
+</body>
+</html>
